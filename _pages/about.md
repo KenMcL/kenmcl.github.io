@@ -4,6 +4,10 @@ title: about
 permalink: /
 subtitle: Department of Mathematics, Tulane University
 
+profile:
+  align: right
+  image: ken-mclaughlin.jpg
+
 selected_papers: false
 social: false
 announcements:
