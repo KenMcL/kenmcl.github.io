@@ -91,10 +91,19 @@ jobs:
           valueFile: "_config.yml"
           propertyPath: "giscus.repo"
           value: ${{ github.repository }}
-      - name: Install and Build 🔧
+      - name: Install ImageMagick
+        timeout-minutes: 3
         run: |
-          sudo apt-get update && sudo apt-get install -y imagemagick
-          pip3 install --upgrade nbconvert
+          if ! command -v convert >/dev/null; then
+            sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update
+            sudo apt-get install -y imagemagick
+          fi
+      - name: Install notebook renderer
+        timeout-minutes: 2
+        run: python -m pip install --upgrade nbconvert
+      - name: Build with Jekyll
+        timeout-minutes: 5
+        run: |
           sed -i 's|^url: .*|url: https://kenmcl.github.io|; s|^baseurl: .*|baseurl: ""|' _config.yml
           sed -i 's|](/al-folio/publications/)|](/publications/)|' _pages/about.md
           export JEKYLL_ENV=production
