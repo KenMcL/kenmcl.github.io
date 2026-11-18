@@ -1,0 +1,34 @@
+name: Import Tulane portrait
+
+on:
+  push:
+    branches: [main]
+    paths: ['.github/workflows/import-tulane-portrait.yml']
+
+permissions:
+  contents: write
+
+jobs:
+  import:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v7
+      - name: Save the faculty portrait
+        run: |
+          portrait=assets/img/ken-mclaughlin.jpg
+          if ! curl --fail --silent --show-error --location --retry 1 --max-time 30 --output "$portrait" 'https://sse.tulane.edu/sites/default/files/styles/large/public/IMG_7706.jpg?itok=A-8RsMT5'; then
+            curl --fail --silent --show-error --location --retry 1 --max-time 30 --output "$portrait" 'https://sse.tulane.edu/sites/default/files/IMG_7706.jpg'
+          fi
+          if ! file --brief --mime-type "$portrait" | grep -qx 'image/jpeg'; then
+            echo 'The downloaded file is not a JPEG.'
+            exit 1
+          fi
+
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -- "$portrait"
+          if ! git diff --cached --quiet; then
+            git commit -m 'Save Ken McLaughlin’s Tulane faculty portrait'
+            git push origin HEAD:main
+          fi
