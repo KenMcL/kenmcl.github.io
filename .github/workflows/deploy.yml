@@ -95,8 +95,9 @@ jobs:
         timeout-minutes: 3
         run: |
           if ! command -v convert >/dev/null; then
-            sudo apt-get -o Acquire::Retries=1 -o Acquire::http::Timeout=20 -o Acquire::https::Timeout=20 update
-            sudo apt-get install -y imagemagick
+            printf '%s\n' 'https://archive.ubuntu.com/ubuntu/' | sudo tee /etc/apt/apt-mirrors.txt >/dev/null
+            sudo apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=20 update
+            sudo apt-get -o Acquire::Retries=1 -o Acquire::https::Timeout=20 install -y --no-install-recommends imagemagick
           fi
       - name: Install notebook renderer
         timeout-minutes: 2
